@@ -67,13 +67,6 @@ def edit_profile(request):
                 messages.info(request, 'Mongo Database Error')
                 return redirect('index')
 
-@login_required(login_url='signin')
-def chat(request):
-    if request.method == 'POST':
-        msg = request.POST['name']
-        return HttpResponse(msg)
-    return render(request,'chat.html')
-
 def email(request):
     email=request.POST.get("email")
     if User.objects.filter(email=email).exists():
