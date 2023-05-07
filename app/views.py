@@ -7,9 +7,6 @@ from django.contrib import messages
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-# mongodb_username = 'abiraj'
-# mongodb_passcode = 'MZJAgsSUQTGIiCZ1'
-
 client = MongoClient("mongodb+srv://abiraj:MZJAgsSUQTGIiCZ1@cluster0.9md8ukt.mongodb.net/?retryWrites=true&w=majority", server_api=ServerApi('1'))
 
 db_user = client.django.user
