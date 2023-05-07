@@ -14,8 +14,11 @@ client = MongoClient("mongodb+srv://abiraj:MZJAgsSUQTGIiCZ1@cluster0.9md8ukt.mon
 
 db_user = client.django.user
 
-def check_user_exist(email):
-    return User.objects.filter(email=email).exists()
+def check_user_exist(value):
+    if '@' in value:
+        return User.objects.filter(email=value).exists()
+    elif '@' not in value:
+        return User.objects.filter(username=value).exists()
 
 @login_required(login_url='signin')
 def index(request):
@@ -28,31 +31,41 @@ def profile(request):
     if(request.user.is_authenticated):
         try:
             user_data = db_user.find_one(filter={'username':request.user.username})
-            user_data = {'username':user_data['username'], 'name':user_data['name'], 'contact':user_data['contact'], 'email':user_data['email']}
+            user_data = {'username':user_data['username'], 'username':user_data['username'], 'contact':user_data['contact'], 'email':user_data['email']}
             return render(request,'profile.html', {'user_data':user_data})
         except:
             messages.info(request, 'Mongo Database Error')
             return redirect('index')
-    else:return redirect('signin')
+    else:
+        return redirect('signin')
 
 @login_required(login_url='signin')
 def edit_profile(request):
     if(request.user.is_authenticated):
         if request.method == 'POST':
-            name=request.POST.get("name")
-            username = request.user.username
-            contact=request.POST.get("contact")
-            email = request.user.email
-            db_user.find_one_and_update(filter={'username':username},update={"$set":{'username':username, 'name':name, 'contact':contact, 'email':email}})
-            return redirect('profile')
-        try:
-            user_data = db_user.find_one(filter={'username':request.user.username})
-            user_data = {'username':user_data['username'], 'name':user_data['name'], 'contact':user_data['contact'], 'email':user_data['email']}
-            return render(request,'edit-profile.html', {'user_data':user_data})
-        
-        except:
-            messages.info(request, 'Mongo Database Error')
-            return redirect('index')
+            username = request.POST.get("su-username")
+            email=request.POST.get("su-email")
+            contact = request.POST.get("contact")
+            password = request.POST.get("password")
+            
+            user = User.objects.get(username=request.user.username)
+            client.django.user.delete_one(filter={'username':request.user.username})
+            user.delete()
+
+            client.django.user.insert_one({'username':username, 'contact':contact, 'email':email, 'password':password})
+            User.objects.create_user(username=username, email=email, password=password)
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('profile')
+        else:
+            try:
+                user_data = db_user.find_one(filter={'username':request.user.username})
+                user_data = {'username':user_data['username'], 'contact':user_data['contact'], 'email':user_data['email']}
+                return render(request,'edit-profile.html', {'user_data':user_data})
+            except:
+                messages.info(request, 'Mongo Database Error')
+                return redirect('index')
 
 @login_required(login_url='signin')
 def chat(request):
@@ -61,36 +74,53 @@ def chat(request):
         return HttpResponse(msg)
     return render(request,'chat.html')
 
+def email(request):
+    email=request.POST.get("email")
+    if User.objects.filter(email=email).exists():
+        return HttpResponse('Email-ID already exists')
+    else:
+        return HttpResponse('')
+    
+def username(request):
+    username=request.POST.get("name").lower()
+    if username=="":
+        return HttpResponse('')
+    elif username.isalnum()==False:
+        return HttpResponse('Invalid Username')
+    elif User.objects.filter(username=username).exists():
+        return HttpResponse('Username already exists')
+    else:
+        return HttpResponse('')
+    
 def signin(request):
     if request.method == 'POST':
-        email=request.POST.get("email")
+        p_key=request.POST.get("email")
         password=request.POST.get("password")
         try:
-            username=email.split('@')[0]
-            if check_user_exist(email):
-                user = authenticate(request, username=username, password=password)
-                if user is not None:
-                    login(request, user)
-                    return redirect('index')
-                else:
-                    messages.info(request, 'Invalid password')
-            else:
-                messages.info(request, 'Email not found')
+            user = authenticate(request, username=p_key, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index')
+        except:pass
+        try:
+            user = authenticate(request, email=p_key, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index')
         except:
-            messages.info(request, 'Error acquired on signin')  
+            messages.info(request, 'user not found')  
     return render(request,'signin.html')
 
 def signup(request):
     if request.method == 'POST':
-        name=request.POST.get("su-name")
+        username=request.POST.get("su-username")
         contact=request.POST.get("su-contact")
         email=request.POST.get("su-email")
         password=request.POST.get("su-password")
-        username=email.split('@')[0]
         if check_user_exist(email):
             messages.info(request, 'User already exist')
         else:
-            client.django.user.insert_one({'username':username, 'name':name, 'contact':contact, 'email':email, 'password':password})
+            client.django.user.insert_one({'username':username, 'contact':contact, 'email':email, 'password':password})
             User.objects.create_user(username=username, email=email, password=password)
             if check_user_exist(email):
                 user = authenticate(request, username=username, password=password)

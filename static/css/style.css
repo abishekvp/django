@@ -52,6 +52,7 @@ section .btn{
     margin: 2% 0 0 0    ;
     background-color: #28292a;
     border-color: #0bd45c;
+    color: #0bd45c;
 }
 
 section .btn:focus{
@@ -139,4 +140,8 @@ section form p button:hover{
 
 .section-edi-profile .input-group input:focus{
     border: none;
+}
+
+.alert_message{
+    color: red;
 }
