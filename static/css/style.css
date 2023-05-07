@@ -1,0 +1,142 @@
+*{
+    transition: 0.3s;
+}
+
+body{
+    overflow-x: hidden;
+    background-color: #28292a;
+    color: #04cc5c;
+}
+
+.signout{
+    position: absolute;
+    right: 2%;
+    top: 2%;
+}
+
+section{
+    margin: 5% 0 0 0;
+    width: 100%;
+}
+
+section h2{
+    color: #0bd45c;
+}
+
+section p{
+    margin: 2% 0 0 0;
+}
+
+section .form-group input{
+    color: #04cc5c;
+    border-radius: 25px;
+    background-color: #28292a;
+    border-color: #0bd45c;
+}
+
+section form{
+    text-align: center;
+}
+
+section .form-group input:focus{
+    color: #0bd45c;
+    border-radius: 25px;
+    border-color: #0bd45c;
+    border-color: -internal-light-dark(#0bd45c, #0bd45c );
+    box-shadow: 0 0 3px #0bd45c;
+    --bs-primary-border-subtle:#0bd45c;
+    background-color: #28292a;
+}
+
+section .btn{
+    margin: 2% 0 0 0    ;
+    background-color: #28292a;
+    border-color: #0bd45c;
+}
+
+section .btn:focus{
+    background-color: #0bd45c;
+    border-color: #0bd45c;
+    box-shadow: 0 0 3px #0bd45c;
+}
+
+section .btn:hover{
+    background-color: #0bd45c;
+    border-color: #0bd45c;
+    box-shadow: 0 0 3px #0bd45c;
+}
+
+section .btn:active{
+    background-color: #0bd45c;
+    border-color: #0bd45c;
+    box-shadow: 0 0 3px #0bd45c;
+}
+
+section form p a{
+    font-weight: 700;
+    color: #04cc5c;
+    border-bottom: 1px solid #04cc5c;
+}
+
+section form p a:hover{
+    color: #04cc5c;
+}
+
+section form p button:hover{
+    box-shadow: 0 0 3px #04cc5c;
+}
+
+#su-re_password:disabled{
+    color: #04cc5c;
+    border-radius: 25px;
+    background-color: #28292a;
+    border-color: #0bd45c;
+}
+
+.messages{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 0;
+}
+
+.messages p{
+    color: red;
+    text-align: center;
+    padding: 2% 0 2% 0;
+}
+
+.headings{
+    text-align: center;
+    margin: 5% 0 0 0;
+}
+
+.content{
+    display: flex;
+}
+
+.section-profile div div label{
+    min-width: 14.1%;
+}
+
+.section-profile div div span{
+    padding: 0 0 0 1%;
+}
+
+.section-edi-profile .edit-profile{
+    text-align: left;
+}
+
+.section-edi-profile .input-group label{
+    min-width: 23%;
+}
+
+.section-edi-profile .input-group input{
+    border: none;
+    background-color: #28292a;
+    color: #04cc5c;
+}
+
+.section-edi-profile .input-group input:focus{
+    border: none;
+}
