@@ -9,7 +9,6 @@ urlpatterns = [
     path('signout',views.signout,name="signout"),
     path('profile',views.profile,name="profile"),
     path('edit_profile',views.edit_profile,name="edit_profile"),
-    path('chat',views.chat,name="chat"),
     path('email',views.email,name="email"),
     path('username',views.username,name="username"),
 ]
