@@ -20,6 +20,11 @@ def dashboard(request):
     return redirect('signin')
 
 def signup(request):
+    try:
+        client.admin.command('ping')
+        print("Connection successful!")
+    except Exception as e:
+        print("Connection failed:", e)
     if request.method == 'POST':
         username = request.POST["username"]
         email = request.POST["email"]
