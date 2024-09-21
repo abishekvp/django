@@ -2,44 +2,62 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+uri = r"mongodb+srv://pro_user:AWGlmNmlRjK4VqY1@cluster0.edxis.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+django = client.django
+users = django.users
 
 def index(request):
     if request.user.is_authenticated:return redirect("dashboard")
     else:return redirect('signin')
 
 def dashboard(request):
-    if request.user.is_authenticated:return render(request,'dashboard.html')
-    else:return redirect('signin')
+    return redirect('signin')
 
 def signup(request):
-    if request.user.is_authenticated:return render(request,'index.html')
-    elif request.method=="POST":
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        if User.objects.filter(username=username).exists() and User.objects.filter(email=email).exists():messages.info(request, 'Username and Email already exists')
-        elif User.objects.filter(username=username).exists():messages.info(request, 'Username already exists')
-        elif User.objects.filter(email=email).exists():messages.info(request, 'Email already exists')
-        else:
-            user = User.objects.create_user(username, email, password)
-            user = authenticate(request, username=username, password=password)
-            login(request, user)
-            return redirect("dashboard")
-        return redirect("signup")
-    else:return render(request,'signup.html')
+    if request.method == 'POST':
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+        if username and email and password:
+            user_name = users.find_one(filter={'username': username})
+            user_email = users.find_one(filter={'email': email})
+            if user_name is None and user_email is None:
+                users.insert_one({
+                    "username": username,
+                    "email": email,
+                    "password": password
+                })
+                return JsonResponse({"message": "New Data"})
+            else:
+                return JsonResponse({"message": "User Exist"})
+    return render(request,'signup.html')
 
 def signin(request):
-    if request.user.is_authenticated:return render(request,'index.html')
-    elif request.method == 'POST':    
+    if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
-        if '@' in username:username = User.objects.get(email=username.lower()).username
-        user = authenticate(request, username=username, password=password)
-        if user:login(request, user)
-        else:messages.info(request, 'User not found')
-        return redirect("signin")
-    else:return render(request,'signin.html')
+        if username and password:
+            user = {
+                "username": username,
+                "password": password
+            }
+            user = users.find_one(filter=user)
+            if user:
+                return JsonResponse({"message": "User found"})
+            else:
+                return JsonResponse({"message": "User not found"})
+    return render(request,'signin.html')
 
 def signout(request):
     if request.user.is_authenticated:logout(request)
     return redirect('signin')
+
+def test(request):
+    result = {"data": "Done"}
+    return JsonResponse({"code": 200, "message": "Success", "result": result})
